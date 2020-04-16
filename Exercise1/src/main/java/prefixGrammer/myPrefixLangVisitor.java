@@ -25,12 +25,12 @@ public class myPrefixLangVisitor extends prefixLangBaseVisitor<myPrefixLangVisit
 
     public Data visitR(prefixLangParser.RContext ctx) {
         // Creates original empty symbol table
-        HashMap<String, String> symbolTable = new HashMap<>();
+        HashMap<String, Data> symbolTable = new HashMap<>();
         // Calls other visitR with symbol table and returns value
         return visitR(ctx, symbolTable);
     }
 
-    public Data visitR(prefixLangParser.RContext ctx, HashMap<String, String> oldSymbolTable) {
+    public Data visitR(prefixLangParser.RContext ctx, HashMap<String, Data> oldSymbolTable) {
         // Only one of the values will not be equal to null, and that's how you know which you're dealing with
         // Value is either T,F, or null
         // If it's just a value
@@ -67,9 +67,31 @@ public class myPrefixLangVisitor extends prefixLangBaseVisitor<myPrefixLangVisit
         else if (ctx.VARIABLE() != null){
             // The final case is the case where its a variable
             String varName = String.valueOf(ctx.VARIABLE());
-            Boolean varValue = Boolean.valueOf(oldSymbolTable.get(varName));
-            Data res = new Data("Boolean", varValue);
-            return res;
+
+            // How do I figure out what kind of variable this is supposed to be
+            // For the Data part of the <String, Data> symbol table entry, Data = <String, Object>
+            // Where the String is the data type "Integer", "Boolean", ect., and Object is the value of that variable
+
+            // Checks to see if value of Data is boolean value
+            Data varData = oldSymbolTable.get(varName);
+
+            return varData;
+
+//            if(Boolean.parseBoolean(varData.value.toString())){
+//                Boolean varValue = Boolean.valueOf(varData.value.toString());
+//                Data res = new Data("Boolean", varValue);
+//                return res;
+//
+//            }
+//            // Checks to see if the value of data in an integer value (I think)
+//            else if(oldSymbolTable.get(varName).value.toString().matches("\\d")){
+//                Integer varValue = Integer.valueOf(oldSymbolTable.get(varName).value.toString());
+//                Data res = new Data("Integer", varValue);
+//                return res;
+//            }
+                // Should I be adding the variables to the symbol table in this funciton?
+
+            //return res; // So should this be returning a Symbol Table Entry instead of just a Data Object?
         }
         else {
             return null;
@@ -77,7 +99,7 @@ public class myPrefixLangVisitor extends prefixLangBaseVisitor<myPrefixLangVisit
 
     }
 
-    public Data visitOrExp(prefixLangParser.OrExpContext ctx, HashMap<String, String> oldSymbolTable) {
+    public Data visitOrExp(prefixLangParser.OrExpContext ctx, HashMap<String, Data> oldSymbolTable) {
         Boolean firstR = Boolean.valueOf((Boolean) visitR(ctx.r(0), oldSymbolTable).value);
         Boolean secondR = Boolean.valueOf((Boolean) visitR(ctx.r(1), oldSymbolTable).value);
         // Evaluate these parts together and return a boolean
@@ -86,7 +108,7 @@ public class myPrefixLangVisitor extends prefixLangBaseVisitor<myPrefixLangVisit
         return res;
     }
 
-    public Data visitAndExp(prefixLangParser.AndExpContext ctx, HashMap<String, String> oldSymbolTable){
+    public Data visitAndExp(prefixLangParser.AndExpContext ctx, HashMap<String, Data> oldSymbolTable){
         Boolean firstA = Boolean.valueOf((Boolean) visitR(ctx.r(0), oldSymbolTable).value);
         Boolean secondA = Boolean.valueOf((Boolean) visitR(ctx.r(1), oldSymbolTable).value);
         Boolean boolRes = firstA && secondA;
@@ -94,14 +116,14 @@ public class myPrefixLangVisitor extends prefixLangBaseVisitor<myPrefixLangVisit
         return res;
     }
 
-    public Data visitNotExp(prefixLangParser.NotExpContext ctx, HashMap<String, String> oldSymbolTable) {
+    public Data visitNotExp(prefixLangParser.NotExpContext ctx, HashMap<String, Data> oldSymbolTable) {
         Boolean notVal = Boolean.valueOf((Boolean) visitR(ctx.r(), oldSymbolTable).value);
         Boolean boolRes = !(notVal);
         Data res = new Data("Boolean", boolRes);
         return res;
     }
 
-    public Data visitIfExp(prefixLangParser.IfExpContext ctx, HashMap<String, String> oldSymbolTable) {
+    public Data visitIfExp(prefixLangParser.IfExpContext ctx, HashMap<String, Data> oldSymbolTable) {
         Boolean cond = Boolean.valueOf((Boolean) visitR(ctx.r(0), oldSymbolTable).value);
         //Boolean cond = visitR(ctx.r(0), oldSymbolTable);
 
@@ -120,26 +142,41 @@ public class myPrefixLangVisitor extends prefixLangBaseVisitor<myPrefixLangVisit
 
     }
 
-    public Data visitLetExp(prefixLangParser.LetExpContext ctx, HashMap<String, String> oldSymbolTable) {
-        HashMap<String, String> symbolTable = new HashMap<>();
+    public Data visitLetExp(prefixLangParser.LetExpContext ctx, HashMap<String, Data> oldSymbolTable) {
+        HashMap<String, Data> symbolTable = new HashMap<>();
+        symbolTable = (HashMap<String, Data>) oldSymbolTable.clone();
 
         // Accesses name of variable and saves it as a string
         String varName = String.valueOf(ctx.VARIABLE());
 
-        // Evaluates value of variable and saves it as a string
-        String varValue = String.valueOf(visitR(ctx.r(0), oldSymbolTable).value); // Should I be passing the old symbol table with this when I evaluate it? **
+        // Evaluates value of variable and saves it as a data object
+        Data varValueData = visitR(ctx.r(0), oldSymbolTable);
 
-        // Adds variable to symbol table
-        symbolTable.put(varName, varValue);
+        symbolTable.put(varName, varValueData);
 
         // Evaluates the expression with the new symbol table
-        Boolean evalRes = Boolean.valueOf((Boolean) visitR(ctx.r(1), oldSymbolTable).value);
-        Data res = new Data("Boolean", evalRes);
-        //return visitR(ctx.r(1), symbolTable);
-        return res;
+        Data evalRes = visitR(ctx.r(1), symbolTable);
+
+        return evalRes;
+
+//        // Evaluates value of variable and saves it as a string
+//        String varValue = String.valueOf(visitR(ctx.r(0), oldSymbolTable).value); // Should I be passing the old symbol table with this when I evaluate it? **
+//        // Should it just be something like
+//        Data varValueData = visitR(ctx.r(0), oldSymbolTable);
+//
+//        //  I need to add the access the type from the symbol table entry  ** But I don't know if it's been added
+//        // The symbol table entries are <String, Data> now so I need to fix the line below
+//
+//        // Adds variable to symbol table
+//        symbolTable.put(varName, varValue);
+//
+//        // Evaluates the expression with the new symbol table
+//        Boolean evalRes = Boolean.valueOf((Boolean) visitR(ctx.r(1), oldSymbolTable).value);
+//        Data res = new Data("Boolean", evalRes);
+//        //return visitR(ctx.r(1), symbolTable);
     }
 
-    public Data visitAddExp(prefixLangParser.AddExpContext ctx, HashMap<String, String> oldSymbolTable){
+    public Data visitAddExp(prefixLangParser.AddExpContext ctx, HashMap<String, Data> oldSymbolTable){
         //Integer firstA = Integer.valueOf((Integer) visitR(ctx.r(0), oldSymbolTable).value);
         //Integer secondA = Integer.valueOf((Integer) visitR(ctx.r(1), oldSymbolTable).value);
         int firstA = (int) visitR(ctx.r(0), oldSymbolTable).value;

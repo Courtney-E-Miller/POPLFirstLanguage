@@ -58,4 +58,16 @@ public interface prefixLangVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitAddExp(prefixLangParser.AddExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link prefixLangParser#lambdaExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLambdaExp(prefixLangParser.LambdaExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link prefixLangParser#callExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCallExp(prefixLangParser.CallExpContext ctx);
 }

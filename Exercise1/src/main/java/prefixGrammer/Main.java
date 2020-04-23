@@ -9,9 +9,13 @@ public class Main {
 
     public static void main(String[] args) {
         //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Or (Let bunny (Or True True) (And bunny False)) True)"));
-        prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Add (Let bunny (Add 1 1) (Add bunny 5)) 3)"));
+        //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Add (Let bunny (Add 1 1) (Add bunny 5)) 3)"));
         //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(And True False)"));
         //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Add 10 2)"));
+        //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Let bunny (Add 1 1) (Add bunny 5))"));
+        prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Let bubble (Lambda X (Add X 1)) (Call bubble 6))"));
+        //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Call fun (Add 1 1)"));
+
         prefixLangParser parser = new prefixLangParser(new CommonTokenStream(lexer));
 
         ParseTree tree = parser.r(); // Declaring a variable of type parse tree and you're telling it what the root rule is

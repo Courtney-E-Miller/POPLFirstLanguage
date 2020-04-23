@@ -106,6 +106,30 @@ public class prefixLangBaseListener implements prefixLangListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAddExp(prefixLangParser.AddExpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLambdaExp(prefixLangParser.LambdaExpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLambdaExp(prefixLangParser.LambdaExpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCallExp(prefixLangParser.CallExpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCallExp(prefixLangParser.CallExpContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

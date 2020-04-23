@@ -19,6 +19,20 @@ public class myPrefixLangVisitor extends prefixLangBaseVisitor<myPrefixLangVisit
         }
     }
 
+    // Created data that's a tripple which represents the data stored for a function declaration
+    public class Function {
+        String varName;
+        prefixLangParser.RContext Expr;
+        HashMap<String, Data> symbolTable;
+
+        public Function(String varName, prefixLangParser.RContext Expr, HashMap<String, Data> symbolTable){
+            this.varName = varName;
+            this.Expr = Expr;
+            this.symbolTable = symbolTable;
+        }
+    }
+
+
     public Data visitStart(prefixLangParser.StartContext ctx) {
         return visitR(ctx.r());
     }
@@ -65,33 +79,20 @@ public class myPrefixLangVisitor extends prefixLangBaseVisitor<myPrefixLangVisit
             return  visitAddExp(ctx.addExp(), oldSymbolTable);
         }
         else if (ctx.VARIABLE() != null){
-            // The final case is the case where its a variable
+            // The case is the case where its a variable
             String varName = String.valueOf(ctx.VARIABLE());
-
-            // How do I figure out what kind of variable this is supposed to be
-            // For the Data part of the <String, Data> symbol table entry, Data = <String, Object>
-            // Where the String is the data type "Integer", "Boolean", ect., and Object is the value of that variable
 
             // Checks to see if value of Data is boolean value
             Data varData = oldSymbolTable.get(varName);
 
             return varData;
+        }
+        else if (ctx.lambdaExp() != null) {
+            return visitLambdaExp(ctx.lambdaExp(), oldSymbolTable);
 
-//            if(Boolean.parseBoolean(varData.value.toString())){
-//                Boolean varValue = Boolean.valueOf(varData.value.toString());
-//                Data res = new Data("Boolean", varValue);
-//                return res;
-//
-//            }
-//            // Checks to see if the value of data in an integer value (I think)
-//            else if(oldSymbolTable.get(varName).value.toString().matches("\\d")){
-//                Integer varValue = Integer.valueOf(oldSymbolTable.get(varName).value.toString());
-//                Data res = new Data("Integer", varValue);
-//                return res;
-//            }
-                // Should I be adding the variables to the symbol table in this funciton?
-
-            //return res; // So should this be returning a Symbol Table Entry instead of just a Data Object?
+        }
+        else if (ctx.callExp() != null){
+            return visitCallExp(ctx.callExp(), oldSymbolTable);
         }
         else {
             return null;
@@ -158,33 +159,48 @@ public class myPrefixLangVisitor extends prefixLangBaseVisitor<myPrefixLangVisit
         Data evalRes = visitR(ctx.r(1), symbolTable);
 
         return evalRes;
-
-//        // Evaluates value of variable and saves it as a string
-//        String varValue = String.valueOf(visitR(ctx.r(0), oldSymbolTable).value); // Should I be passing the old symbol table with this when I evaluate it? **
-//        // Should it just be something like
-//        Data varValueData = visitR(ctx.r(0), oldSymbolTable);
-//
-//        //  I need to add the access the type from the symbol table entry  ** But I don't know if it's been added
-//        // The symbol table entries are <String, Data> now so I need to fix the line below
-//
-//        // Adds variable to symbol table
-//        symbolTable.put(varName, varValue);
-//
-//        // Evaluates the expression with the new symbol table
-//        Boolean evalRes = Boolean.valueOf((Boolean) visitR(ctx.r(1), oldSymbolTable).value);
-//        Data res = new Data("Boolean", evalRes);
-//        //return visitR(ctx.r(1), symbolTable);
     }
 
     public Data visitAddExp(prefixLangParser.AddExpContext ctx, HashMap<String, Data> oldSymbolTable){
-        //Integer firstA = Integer.valueOf((Integer) visitR(ctx.r(0), oldSymbolTable).value);
-        //Integer secondA = Integer.valueOf((Integer) visitR(ctx.r(1), oldSymbolTable).value);
         int firstA = (int) visitR(ctx.r(0), oldSymbolTable).value;
         int secondA = (int) visitR(ctx.r(1), oldSymbolTable).value;
-        //int fA = firstA.intValue();
-        //int sA = secondA.intValue();
         int addRes = firstA + secondA;
         Data res = new Data("Integer", addRes);
         return res;
     }
+
+    public Data visitLambdaExp(prefixLangParser.LambdaExpContext ctx, HashMap<String, Data> oldSymbolTable){
+
+        // Pulling relevant pieces out of ctx
+        String varName = String.valueOf(ctx.VARIABLE());
+
+        // Creating new Function data structure
+        Function newFunc = new Function(varName, ctx.r(), oldSymbolTable);
+
+        Data res = new Data("function", newFunc);
+        return res;
+    }
+
+    public Data visitCallExp(prefixLangParser.CallExpContext ctx, HashMap<String, Data> oldSymbolTable) {
+
+        String varName = String.valueOf(ctx.VARIABLE());
+
+        // Looking up varName in old symbol table and pulling corresponding function
+        Function F = (Function)oldSymbolTable.get(varName).value;
+
+        String InputVarName = F.varName;
+        prefixLangParser.RContext BodyExpr = F.Expr;
+        HashMap<String, Data> functionOldSymbolTable = F.symbolTable;
+
+        // Evaluating Expr using old symbol table
+        Data inputValue =  visitR(ctx.r(), oldSymbolTable);
+
+        // Creating temp ST with all values from funcOldSymTable plus new input value
+        HashMap<String, Data> tempST = (HashMap<String, Data>) functionOldSymbolTable.clone();
+        tempST.put(InputVarName, inputValue);
+
+        Data res = visitR(BodyExpr, tempST);
+        return res;
+    }
+
 }

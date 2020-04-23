@@ -86,4 +86,24 @@ public interface prefixLangListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAddExp(prefixLangParser.AddExpContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link prefixLangParser#lambdaExp}.
+	 * @param ctx the parse tree
+	 */
+	void enterLambdaExp(prefixLangParser.LambdaExpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link prefixLangParser#lambdaExp}.
+	 * @param ctx the parse tree
+	 */
+	void exitLambdaExp(prefixLangParser.LambdaExpContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link prefixLangParser#callExp}.
+	 * @param ctx the parse tree
+	 */
+	void enterCallExp(prefixLangParser.CallExpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link prefixLangParser#callExp}.
+	 * @param ctx the parse tree
+	 */
+	void exitCallExp(prefixLangParser.CallExpContext ctx);
 }

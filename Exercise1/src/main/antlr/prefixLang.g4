@@ -25,8 +25,8 @@ callExp: '(' 'Call' VARIABLE r ')';
 /*
 * Lexer Rules
 */
+BOOLVAL : 'True' | 'False';
 VARIABLE : STR (STR | INTVAL)*;
 INTVAL: [0-9]+;
 STR : [a-zA-Z]+;
-BOOLVAL : 'True' | 'False';
 WS  : [ \t\r\n]+ -> skip ;

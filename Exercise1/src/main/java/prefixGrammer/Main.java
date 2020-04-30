@@ -8,13 +8,26 @@ import org.antlr.v4.runtime.tree.ParseTree;
 public class Main {
 
     public static void main(String[] args) {
-        //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Or (Let bunny (Or True True) (And bunny False)) True)"));
+        // Demonstrates Or, And, and Variable Assignment
+        prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Or (Let bunny (Or True True) (And bunny False)) True)"));
+
+        // Demonstrates Nested Add and Variable Assignment
         //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Add (Let bunny (Add 1 1) (Add bunny 5)) 3)"));
+
+        // Demonstrates And
         //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(And True False)"));
+
+        // Demonstrates If
+        //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(If True (Not True) (Not False))"));
+
+        // Demonstrates Add
         //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Add 10 2)"));
+
+        // Demonstrates Add and Variable Assignment
         //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Let bunny (Add 1 1) (Add bunny 5))"));
-        prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Let bubble (Lambda X (Add X 1)) (Call bubble 6))"));
-        //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Call fun (Add 1 1)"));
+
+        // Demonstrates Function Declaration and Calling
+        //prefixLangLexer lexer = new prefixLangLexer(CharStreams.fromString("(Let bubble (Lambda X (Add X 1)) (Call bubble 6))"));
 
         prefixLangParser parser = new prefixLangParser(new CommonTokenStream(lexer));
 
